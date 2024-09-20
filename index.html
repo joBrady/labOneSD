@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GloboTech</title>
+
+    <style>
+      body {
+        display: flex;
+        flex-direction: column; /* Stack elements vertically */
+        /*justify-content: center; /* Center elements vertically */
+        align-items: center; /* Center elements horizontally */
+        height: 100vh; /* Full height of the viewport */
+        margin: 0;
+        text-align: center; /* Center text within the body */
+      }
+      h1 {
+        text-align: center;
+      }
+      .h1subtext {
+        font-size: 12px;
+      }
+      .tempReading,
+      .tempGraph,
+      .phoneInfo {
+        margin: 10px 0; /* Optional: adds spacing between elements */
+      }
+      .tempData {
+        display: block;
+        margin: 10px auto; /* Centers the image */
+        width: 100px;
+        height: 100px;
+      }
+      .phoneNumEntering {
+        display: block;
+        margin: 10px auto; /* Centers input within form */
+        width: 75%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Dual Probe Thermometer</h1>
+    <p class="h1subtext">A GloboTech Product &#x1F30D;</p>
+
+    <div class="header-row">
+      <h2 class="tempReading">Temperature:</h2>
+      <h2 class="tempGraph">Heat Trend Graph:</h2>
+    </div>
+    <img
+      class="tempData"
+      src="images/image.png"
+      alt="A graph of the trends in temperature:"
+    />
+    <h2 class="phoneInfo">Text Updates:</h2>
+    <form>
+      <label for="textbox">Enter Phone Number:</label>
+      <input
+        type="text"
+        id="textbox"
+        class="phoneNumEntering"
+        placeholder="Phone Number"
+      />
+    </form>
+  </body>
+</html>
