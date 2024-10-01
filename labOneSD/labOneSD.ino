@@ -1,28 +1,35 @@
 #include <DallasTemperature.h>
 #include <OneWire.h>
+#include <LiquidCrystal.h>
 
 
-#define BUTTON_PIN 0
+//Pins for Buttons and Such 18,19,21
 
 #define DS18B20_PIN 4          // DS18B20 Data Pin
 #define DS18B20_POWER_PIN 12    // DS18B20 Vcc pin 
+
+#define buttonOne 18
+#define buttonTwo 19
 
 #define DEEP_SLEEP_TIME 1000 * 60 * 2 //Deep sleep in 2 minutes
 
 OneWire oneWire(DS18B20_PIN);
 DallasTemperature sensors(&oneWire);
 
-int numDev
+int numberOfDevices;
+const int rs = 13, en = 12, d4 = 14, d5 = 27, d6 = 26, d7 = 25;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
-Device Address tempDeviceAddress;
+DeviceAddress tempDeviceAddress;
+
 void setup()
 {
-  Serial.begin(115200)
+  Serial.begin(115200);
   pinMode(DS18B20_POWER_PIN, OUTPUT);
   digitalWrite(DS18B20_POWER_PIN, HIGH);
   
   sensors.begin();
-  numDev = sensors.getDeviceCount();
+  numberOfDevices = sensors.getDeviceCount();
   
   Serial.print("Locating devices...");
   Serial.print("Found ");
@@ -51,7 +58,7 @@ void loop()
     sensors.requestTemperatures();
     float temperatureC = sensors.getTempCByIndex(0);
 
-     for(int i=0;i<numberOfDevices; i++){
+    for(int i=0;i<numberOfDevices; i++){
     // Search the wire for address
     if(sensors.getAddress(tempDeviceAddress, i)){
       // Output the device ID
@@ -74,8 +81,5 @@ void printAddress(DeviceAddress deviceAddress) {
     if (deviceAddress[i] < 16) Serial.print("0");
       Serial.print(deviceAddress[i], HEX);
   }
-}
-
-    delay(100);
 
 }
