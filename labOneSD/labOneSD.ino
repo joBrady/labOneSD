@@ -15,15 +15,17 @@ DallasTemperature sensors(&oneWire);
 
 int onOne = 1;
 int onTwo = 1;
-int buttonStateOne;
-int lastOne = 0;
-int lastTwo = 0;
-int buttonStateTwo;
+int buttonStateOne = 0;
+int buttonStateTwo = 0;
 int numberOfDevices;
 
-unsigned long lastTimeOne = 0;
-unsigned long lastTimeTwo = 0;
-unsigned long debounceDelay = 50;
+unsigned long lastDebounceTimeOne = 0;
+unsigned long lastDebounceTimeTwo = 0;
+int lastButtonStateOne = 0;
+int lastButtonStateTwo = 0;
+
+unsigned long debounceDelay = 5;
+
 const int rs = 13, en = 12, d4 = 14, d5 = 27, d6 = 26, d7 = 25;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
@@ -78,17 +80,63 @@ void setup()
 void loop()
 {   
     sensors.requestTemperatures();
+     int readingOne = digitalRead(buttonOne);
+  int readingTwo = digitalRead(buttonTwo);
+
+  // Debounce logic for button one
+  if (readingOne != lastButtonStateOne) {
+    lastDebounceTimeOne = millis();
+  }
+  if ((millis() - lastDebounceTimeOne) > debounceDelay) {
+    if (readingOne != buttonStateOne) {
+      buttonStateOne = readingOne;
+      if (buttonStateOne == LOW) {
+        onOne = !onOne;  // Toggle on/off
+        if (onOne == 0) {
+          Serial.println("HELL1");
+          lcd.setCursor(8, 0);
+          lcd.print(" OFF ");
+        }
+      }
+    }
+  }
+  lastButtonStateOne = readingOne;
+
+  // Debounce logic for button two
+  if (readingTwo != lastButtonStateTwo) {
+    lastDebounceTimeTwo = millis();
+  }
+  if ((millis() - lastDebounceTimeTwo) > debounceDelay) {
+    if (readingTwo != buttonStateTwo) {
+      buttonStateTwo = readingTwo;
+      if (buttonStateTwo == LOW) {
+        onTwo = !onTwo;  // Toggle on/off
+        if (onTwo == 0) {
+          Serial.println("ROCKy");
+          lcd.setCursor(8, 1);
+          lcd.print(" OFF ");
+        }
+      }
+    }
+  }
+  lastButtonStateTwo = readingTwo;
+    /*
     int readOne = digitalRead(buttonOne);
     int readTwo = digitalRead(buttonTwo);
+
 
      if(readOne != lastOne){
       lastTimeOne = millis();
      }
 
     if((millis()-lastTimeOne)>debounceDelay){
+      Serial.println("Kill1");
       if(readOne!=buttonStateOne){
         buttonStateOne = readOne;
+        Serial.println("Kill2");
+        
         if(buttonStateOne == HIGH){
+          Serial.println("Rada");
           lastOne = readOne;
           if(onOne = 1){
           lcd.setCursor(8,0);
@@ -100,10 +148,9 @@ void loop()
       }
       }
     }
-        
-      
+ */       
     
-
+/*
     if(buttonStateTwo == HIGH){
       Serial.println("DIE2");
       if(onTwo == 1){
@@ -114,6 +161,7 @@ void loop()
         onTwo = 1;
       }
     }
+    */
 
     
     for(int i=0;i<numberOfDevices; i++){
@@ -128,12 +176,14 @@ void loop()
       float tempF = DallasTemperature::toFahrenheit(tempC);
 
       if(tempF != -196.00){
+
        if(i==0 && onOne == 1){
         lcd.setCursor(8,0);
         lcd.print(tempF);
        }
-        if(i==1 && onTwo == 1){
-        lcd.setCursor(8,0);
+
+       if(i==1 && onTwo == 1){
+        lcd.setCursor(8,1);
         lcd.print(tempF);
        }
         
@@ -155,7 +205,7 @@ void loop()
     }
     
 
-  delay(20);
+  //delay(20);
   
 }
 
