@@ -9,7 +9,11 @@
 
 #define buttonOne 18
 #define buttonTwo 19
+<<<<<<< HEAD
 #define masterSwitch 21
+=======
+#define switchThree 21
+>>>>>>> 14eaf817d998fa117452768e11ec38a5d4f116b8
 
 OneWire oneWire(DS18B20_PIN);
 DallasTemperature sensors(&oneWire);
@@ -19,6 +23,11 @@ int onTwo = 1;
 int buttonStateOne = 0;
 int buttonStateTwo = 0;
 int numberOfDevices;
+int tempDevices;
+int error = 0;
+int previousError = 1;
+int chase = 1;
+int fixMessage = 0;
 
 float sensorData[2];
 
@@ -34,15 +43,18 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 DeviceAddress tempDeviceAddress;
 
+DeviceAddress deviceOne;
+DeviceAddress deviceTwo;
+
 void setup()
 {
   Serial.begin(115200);
 
   pinMode(buttonOne,INPUT);
   pinMode(buttonTwo,INPUT);
+  pinMode(switchThree,INPUT);
   
   lcd.begin(16, 2);
-  //analogWrite(d4,100);
   // Clears the LCD display
   lcd.clear();
   lcd.print("Sensor1:");
@@ -56,13 +68,16 @@ void setup()
   Serial.print("Found ");
   Serial.print(numberOfDevices, DEC);
   Serial.println(" devices.");
-
-  //if(numberOfDevices<2){
-   //lcd.clear();
-   //lcd.print("ERROR");
-   //while(sensors.getDeviceCount()!=2){}
-  //}
-
+ 
+  if(numberOfDevices<2){
+   lcd.clear();
+   lcd.print("ERROR MISSING");
+   lcd.setCursor(0,1);
+   lcd.print("TEMP SENSOR");
+  while(sensors.getDeviceCount()!=2){}
+  }
+  
+/*
   for(int i=0;i<numberOfDevices; i++){
     // Search the wire for address
     if(sensors.getAddress(tempDeviceAddress, i)){
@@ -77,6 +92,7 @@ void setup()
       Serial.print(" but could not detect address. Check power and cabling");
     }
   }
+  */
 
 }
 
@@ -85,6 +101,18 @@ void loop()
     sensors.requestTemperatures();
     int readingOne = digitalRead(buttonOne);
     int readingTwo = digitalRead(buttonTwo);
+    int readingThree = digitalRead(switchThree);
+
+    
+    if(readingThree == LOW){
+
+      
+      if(fixMessage == 1){
+          lcd.print("Sensor1:");
+          lcd.setCursor(0,1);
+          lcd.print("Sensor2:");
+          fixMessage = 0;
+      }
 
       if(readingOne == HIGH){
       if(onOne == 1){
@@ -110,46 +138,101 @@ void loop()
     // Search the wire for address
     if(sensors.getAddress(tempDeviceAddress, i)){
       // Output the device ID
+      
+
+        if(previousError >= 2){
+          error = error + 1;
+          lcd.clear();
+          lcd.print("ERROR MISSING");
+          lcd.setCursor(0,1);
+          lcd.print("TEMP SENSOR");
+          if(error != (previousError -1)){
+            error = 0;
+            lcd.clear();
+            lcd.print("Sensor1:");
+            lcd.setCursor(0,1);
+            lcd.print("Sensor2:");
+            previousError = 1;
+          }
+        }else{
+
       Serial.print("Temperature for device: ");
       Serial.println(i,DEC);
-
       // Print the data
       float tempC = sensors.getTempC(tempDeviceAddress);
       sensorData[i] = tempC;
       float tempF = DallasTemperature::toFahrenheit(tempC);
 
+
+      /*
+      if(tempDeviceAddress == deviceOne){
+        Serial.print("CountTwo");
+        countTwo = countTwo + 1;
+        countOne = 0;
+      }
+       if(tempDeviceAddress == deviceTwo){
+        Serial.print("CountOne");
+        countOne = countOne + 1;
+        countTwo = 0;
+      }
+      if(countOne == 0 && errorOne == 1){
+        lcd.setCursor(0,0);
+        lcd.print("Sensor1:        ");
+        errorOne = 0;
+      }
+
+      if(countTwo == 0 && errorTwo == 1){
+        lcd.setCursor(0,1);
+        lcd.print("Sensor2:        ");
+        errorTwo = 0;
+      }
+
+      if(countOne > 5){
+        tempF = -196.00;
+        errorOne = 1;
+      }
+      if(countTwo > 5){
+        tempF = -196.00;
+        errorTwo = 1;
+      }
+      */
+
       if(tempF != -196.00){
 
-       if(i==0 && onOne == 1){
+       if(i==0 && onOne == 1 && error<4){
         lcd.setCursor(8,0);
-        lcd.print(tempF);
-       }
-
-       if(i==1 && onTwo == 1){
+        lcd.print(tempC);
+       } else if(i == 1 && onTwo == 1){
         lcd.setCursor(8,1);
-        lcd.print(tempF);
+        lcd.print(tempC);
        }
         
-
         Serial.print("Temp C: ");
         Serial.print(tempC);
         Serial.print(" Temp F: ");
         Serial.println(tempF); // Converts tempC to Fahrenheit
+        
+
       }else{
-        if(i==0){
-          lcd.setCursor(8,0);
-          lcd.print("ERROR");
+        if(i==1){
+          lcd.setCursor(0,0);
+          lcd.print("UNPLUGGED SENSOR");
         }else{
-          lcd.setCursor(8,1);
-          lcd.print("ERROR");
+          lcd.setCursor(0,1);
+          lcd.print("UNPLUGGED SENSOR");
         }
       }
+        }
+    }else{
+      previousError = previousError + 1;
     }
     }
-    
-
-  //delay(20);
+    }else{
+      lcd.clear();
+      fixMessage = 1;
+    }
 }
+
 
 // function to print a device address
 void printAddress(DeviceAddress deviceAddress){
