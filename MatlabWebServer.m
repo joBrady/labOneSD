@@ -127,4 +127,12 @@ function handleClient(clientSocket)
         disp(['Error handling client: ' ME.message]);
         clientSocket.close();
     end
+% After saving the graph as 'graph.png'
+fileInfo = dir(graphFile);
+disp(['Size of generated graph.png: ' num2str(fileInfo.bytes) ' bytes']);
+disp(['Length of Base64-encoded image: ' num2str(length(encodedGraph))]);
+disp(['JSON response being sent to ESP32: ' jsonResponse]);
+
+
+
 end
