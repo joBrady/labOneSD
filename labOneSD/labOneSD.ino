@@ -9,6 +9,7 @@
 
 #define buttonOne 18
 #define buttonTwo 19
+#define masterSwitch 21
 
 OneWire oneWire(DS18B20_PIN);
 DallasTemperature sensors(&oneWire);
@@ -18,6 +19,8 @@ int onTwo = 1;
 int buttonStateOne = 0;
 int buttonStateTwo = 0;
 int numberOfDevices;
+
+float sensorData[2];
 
 unsigned long lastDebounceTimeOne = 0;
 unsigned long lastDebounceTimeTwo = 0;
@@ -84,7 +87,6 @@ void loop()
     int readingTwo = digitalRead(buttonTwo);
 
       if(readingOne == HIGH){
-      Serial.println("DIE2");
       if(onOne == 1){
         lcd.setCursor(8,0);
         lcd.print(" OFF ");
@@ -113,6 +115,7 @@ void loop()
 
       // Print the data
       float tempC = sensors.getTempC(tempDeviceAddress);
+      sensorData[i] = tempC;
       float tempF = DallasTemperature::toFahrenheit(tempC);
 
       if(tempF != -196.00){
@@ -157,69 +160,3 @@ void printAddress(DeviceAddress deviceAddress){
   }
 }
 
-//OLD DOG CODE
-/*
-  // Debounce logic for button one
-  if (readingOne != lastButtonStateOne) {
-    lastDebounceTimeOne = millis();
-  }
-  if ((millis() - lastDebounceTimeOne) > debounceDelay) {
-    if (readingOne != buttonStateOne) {
-      buttonStateOne = readingOne;
-      if (buttonStateOne == HIGH) {
-        onOne = !onOne;  // Toggle on/off
-        if (onOne == 0) {
-          Serial.println("HELL1");
-          lcd.setCursor(8, 0);
-          lcd.print(" OFF ");
-        }
-      }
-    }
-  }
-  */
-/*
-  // Debounce logic for button two
-  if (readingTwo != lastButtonStateTwo) {
-    lastDebounceTimeTwo = millis();
-  }
-  if ((millis() - lastDebounceTimeTwo) > debounceDelay) {
-    if (readingTwo != buttonStateTwo) {
-      buttonStateTwo = readingTwo;
-      if (buttonStateTwo == HIGH) {
-        onTwo = !onTwo;  // Toggle on/off
-        if (onTwo == 0) {
-          Serial.println("ROCKy");
-          lcd.setCursor(8, 1);
-          lcd.print(" OFF ");
-        }
-      }
-    }
-  }
-  lastButtonStateTwo = readingTwo;
-    /*
-    int readOne = digitalRead(buttonOne);
-    int readTwo = digitalRead(buttonTwo);
-
-
-     if(readOne != lastOne){
-      lastTimeOne = millis();
-     }
-
-    if((millis()-lastTimeOne)>debounceDelay){
-      if(readOne!=buttonStateOne){
-        buttonStateOne = readOne;
-        Serial.println("Kill2");
-        
-        if(buttonStateOne == HIGH){
-          lastOne = readOne;
-          if(onOne = 1){
-          lcd.setCursor(8,0);
-          lcd.print(" OFF ");
-          onOne = 0;
-        }else{
-        onOne = 1;
-      }
-      }
-      }
-    }
- */       
